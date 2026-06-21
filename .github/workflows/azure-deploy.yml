@@ -121,17 +121,19 @@ jobs:
 
           echo "=== Uploading and swapping ==="
           B64=$(base64 -w0 /tmp/index_deploy.html)
+          B64_CSS=$(base64 -w0 $SRC/style.css)
           az vm run-command invoke -g $RG -n $VM \
             --command-id RunShellScript \
             --scripts "
               echo '$B64' | base64 -d > $APP_DIR/$INACTIVE/index.html
+              echo '$B64_CSS' | base64 -d > $APP_DIR/$INACTIVE/style.css
               ln -sfn $APP_DIR/$INACTIVE $APP_DIR/current
               echo '$DEPLOY_TIME - deployed $INACTIVE' >> $APP_DIR/deploy.log
               apache2ctl graceful
             "
 
           echo "=== Deploy complete ==="
-
+          
       - name: Verify deployment
         run: |
           sleep 2
